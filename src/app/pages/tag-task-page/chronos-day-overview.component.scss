@@ -1,0 +1,158 @@
+:host {
+  display: block;
+  padding: var(--s3);
+}
+
+.day-heading,
+.current-activity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  justify-content: space-between;
+}
+
+.day-heading {
+  margin-bottom: var(--s3);
+}
+
+h1,
+h2,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--s2);
+}
+
+.eyebrow,
+.day-date,
+dt,
+.muted,
+.empty-records {
+  color: var(--text-color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.eyebrow {
+  margin-bottom: var(--s);
+  font-weight: var(--font-weight-semibold);
+}
+
+.day-date {
+  margin-top: var(--s);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-half);
+}
+
+.day-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s2);
+  margin-bottom: var(--s3);
+}
+
+.day-summary > div,
+.current-activity,
+.recorded-panel {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--s2);
+}
+
+dd {
+  margin-top: var(--s);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.current-activity {
+  margin-bottom: var(--s3);
+  border-inline-start: var(--s-half) solid var(--brand);
+}
+
+.current-activity > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.day-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s3);
+}
+
+.day-plan {
+  flex: 2 1 calc(var(--s) * 60);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.recorded-panel {
+  flex: 1 1 calc(var(--s) * 30);
+  min-width: 0;
+}
+
+.muted {
+  line-height: var(--line-height-normal);
+}
+
+ul {
+  padding: 0;
+  margin: var(--s2) 0 0;
+  list-style: none;
+}
+
+.recorded-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  width: 100%;
+  padding: var(--s2) var(--s);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-color);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.recorded-task:hover,
+.recorded-task:focus-visible {
+  background: var(--bg);
+}
+
+.recorded-task > span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.duration {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty-records {
+  padding-block: var(--s2);
+  line-height: var(--line-height-normal);
+}

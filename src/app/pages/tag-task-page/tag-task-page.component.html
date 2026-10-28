@@ -1,6 +1,26 @@
-<work-view
-  [backlogTasks]="backlogTasks()"
-  [doneTasks]="doneTasks()"
-  [isShowBacklog]="false"
-  [undoneTasks]="undoneTasks()"
-></work-view>
+@if (isToday()) {
+  <chronos-day-overview>
+    <div cdkDropListGroup>
+      <task-list
+        [tasks]="undoneTasks()"
+        listId="PARENT"
+        listModelId="UNDONE"
+      />
+      @if (doneTasks().length) {
+        <h2>{{ T.F.CHRONOS.COMPLETED | translate }}</h2>
+        <task-list
+          [tasks]="doneTasks()"
+          listId="PARENT"
+          listModelId="DONE"
+        />
+      }
+    </div>
+  </chronos-day-overview>
+} @else {
+  <work-view
+    [backlogTasks]="backlogTasks()"
+    [doneTasks]="doneTasks()"
+    [isShowBacklog]="false"
+    [undoneTasks]="undoneTasks()"
+  ></work-view>
+}

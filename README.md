@@ -1,3 +1,7 @@
+# Chronos-SP
+
+Personal calendar and time-tracking fork of Super Productivity. [Run the first prototype in WSL](docs/chronos-sp-wsl.md).
+
 <a href="https://super-productivity.com/"><img alt="Banner" src="docs/screens/banner.png"/></a>
 
 <p align="center">
