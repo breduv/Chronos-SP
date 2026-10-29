@@ -1,4 +1,4 @@
-import { LanguageCode } from '../../core/locale.constants';
+import { LanguageCode, DateTimeLocales } from '../../core/locale.constants';
 import { environment } from '../../../environments/environment';
 import { DEFAULT_FOCUS_MODE_SOUND_VOLUME } from '../focus-mode/focus-mode.model';
 import {
@@ -12,11 +12,11 @@ import { INBOX_PROJECT } from '../project/project.const';
 import { DEFAULT_MAX_BACKUP_FILES } from '../../../../electron/shared-with-frontend/backup-file-cleanup.util';
 
 const minute = 60 * 1000;
-const defaultTaskNotesTemplate = `**How can I best achieve it now?**
+const defaultTaskNotesTemplate = `**Как лучше выполнить это сейчас?**
 
-**What do I want?**
+**Что я хочу получить?**
 
-**Why do I want it?**
+**Зачем мне это?**
 `;
 
 export const DEFAULT_DAY_START = '9:00';
@@ -38,7 +38,7 @@ export const DEFAULT_GLOBAL_CONFIG: GlobalConfigState = {
   },
   localization: {
     lng: LanguageCode.ru,
-    dateTimeLocale: undefined,
+    dateTimeLocale: DateTimeLocales.ru_ru,
     firstDayOfWeek: undefined,
   },
   tasks: {

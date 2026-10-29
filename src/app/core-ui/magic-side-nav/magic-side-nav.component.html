@@ -79,7 +79,8 @@
         [class.visible]="!isMobile()"
         (click)="toggleSideNavMode()"
         [attr.aria-label]="
-          isFullMode() ? 'Switch to compact mode' : 'Switch to full mode'
+          (isFullMode() ? T.F.CHRONOS.SIDEBAR_COMPACT : T.F.CHRONOS.SIDEBAR_FULL)
+            | translate
         "
         [attr.aria-expanded]="isFullMode()"
       >
@@ -221,7 +222,7 @@
     class="resize-handle position-left"
     [class.compactMode-handle]="!isFullMode()"
     (mousedown)="onResizeStart($event)"
-    [attr.aria-label]="'Resize sidenav'"
+    [attr.aria-label]="T.F.CHRONOS.SIDEBAR_RESIZE | translate"
     role="separator"
   ></div>
 }

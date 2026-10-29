@@ -67,7 +67,7 @@ test.describe('Chronos quick activities and durable history', () => {
       page.locator('.quick-activity').filter({ hasText: 'Дорога' }),
     ).toHaveCount(1);
     await expect(
-      page.locator('.recorded-task').filter({ hasText: 'Дорога' }),
+      page.locator('.session-entry').filter({ hasText: 'Дорога' }),
     ).toHaveCount(1);
   });
 
@@ -137,5 +137,32 @@ test.describe('Chronos quick activities and durable history', () => {
     } finally {
       await context.close();
     }
+  });
+  test('lets unused starter activities be renamed and removed without reappearing', async ({
+    page,
+    workViewPage,
+  }) => {
+    await workViewPage.waitForTaskList();
+    const quick = page.locator('chronos-quick-activities');
+    await quick.locator('header button').click();
+    await expect(quick.locator('li')).toHaveCount(4);
+    const input = quick.locator('li input').first();
+    await input.fill('Дорога на учёбу');
+    await input.press('Tab');
+    await quick.locator('li').nth(1).getByRole('button').click();
+    await expect(quick.getByRole('button', { name: 'Дорога', exact: true })).toHaveCount(
+      0,
+    );
+    await expect(quick.getByRole('button', { name: 'Еда', exact: true })).toHaveCount(0);
+    await expect(page.locator('.session-entry')).toHaveCount(0);
+    await flushPendingWrites(page);
+    await page.reload();
+    await expect(
+      quick.getByRole('button', { name: 'Дорога на учёбу', exact: true }),
+    ).toBeVisible();
+    await expect(quick.getByRole('button', { name: 'Дорога', exact: true })).toHaveCount(
+      0,
+    );
+    await expect(quick.getByRole('button', { name: 'Еда', exact: true })).toHaveCount(0);
   });
 });

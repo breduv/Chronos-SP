@@ -27,7 +27,7 @@ test.describe('Chronos timer session journal', () => {
     await page.reload();
     await expect(page.locator('.session-entry')).toHaveCount(2);
     expect(await page.locator('.session-range').allTextContents()).toEqual(ranges);
-    await page.locator('.recorded-task').filter({ hasText: 'Chronos walk' }).click();
+    await walk.locator('.time-wrapper').click();
     const dialog = page.locator('dialog-time-estimate');
     const timeInput = dialog.locator('input-duration-slider input').first();
     await timeInput.fill('30m');

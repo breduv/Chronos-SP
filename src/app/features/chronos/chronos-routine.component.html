@@ -5,21 +5,22 @@
   @if (!habitOnly()) {
     <header>
       <h2>{{ T.F.CHRONOS.ROUTINE | translate }}</h2>
-      <label
-        >{{ T.F.CHRONOS.SESSION_DAY | translate
-        }}<input
+      <mat-form-field
+        ><mat-label>{{ T.F.CHRONOS.SESSION_DAY | translate }}</mat-label
+        ><input
+          matInput
           class="routine-day"
           type="date"
           [value]="day()"
           (change)="selectDay($event)"
-      /></label>
+      /></mat-form-field>
     </header>
     <ol class="planned-slots">
       @for (slot of planned(); track slot.task.id) {
         <li>
           <span
             >{{ slot.start | localeDate: 'HH:mm' }}
-            @if (slot.end > slot.start) {
+            @if (slot.task.hasPlannedTime && slot.end > slot.start) {
               — {{ slot.end | localeDate: 'HH:mm' }}
             }
           </span>
@@ -36,90 +37,116 @@
       }
     </ol>
   }
-  <details class="routine-create">
-    <summary>
-      {{ (habitOnly() ? T.F.CHRONOS.ADD_HABIT : T.F.CHRONOS.ADD_ROUTINE) | translate }}
-    </summary>
+  <mat-expansion-panel
+    class="routine-create"
+    [expanded]="expanded()"
+    (opened)="expanded.set(true)"
+    (closed)="expanded.set(false)"
+  >
+    <mat-expansion-panel-header
+      ><mat-panel-title>
+        {{ (habitOnly() ? T.F.CHRONOS.ADD_HABIT : T.F.CHRONOS.ADD_ROUTINE) | translate }}
+      </mat-panel-title></mat-expansion-panel-header
+    >
     <form (submit)="save($event)">
-      @if (!habitOnly()) {
-        <label
-          >{{ T.F.CHRONOS.ROUTINE_KIND | translate
-          }}<select
+      @if (!habitOnly() && !editing()) {
+        <mat-form-field
+          ><mat-label>{{ T.F.CHRONOS.ROUTINE_KIND | translate }}</mat-label
+          ><select
+            matNativeControl
             class="routine-kind"
             [value]="mode()"
             (change)="mode.set(value($event))"
           >
             <option value="event">{{ T.F.CHRONOS.EVENT | translate }}</option>
+            <option value="task">{{ T.F.CHRONOS.TASK | translate }}</option>
             <option value="habit">{{ T.F.CHRONOS.HABIT | translate }}</option>
-          </select></label
+          </select></mat-form-field
         >
       }
-      <label
-        >{{ T.F.CHRONOS.ROUTINE_NAME | translate
-        }}<input
+      <mat-form-field
+        ><mat-label>{{ T.F.CHRONOS.ROUTINE_NAME | translate }}</mat-label
+        ><input
+          matInput
           class="routine-name"
           name="title"
           [value]="name()"
           (input)="name.set(value($event))"
           required
-      /></label>
+      /></mat-form-field>
       @if (isHabit()) {
-        <label
-          >{{ T.F.CHRONOS.HABIT_TIME | translate
-          }}<input
+        <mat-form-field
+          ><mat-label>{{ T.F.CHRONOS.HABIT_TIME | translate }}</mat-label
+          ><input
+            matInput
             class="habit-time"
             type="time"
             name="time"
             [value]="time()"
             (input)="time.set(value($event))"
             required
-        /></label>
+        /></mat-form-field>
         <fieldset>
           <legend>{{ T.F.CHRONOS.HABIT_DAYS | translate }}</legend>
           @for (item of days; track item.day) {
-            <label
-              ><input
-                type="checkbox"
-                [checked]="weekdays().includes(item.day)"
-                (change)="toggleWeekday(item.day)"
-              />{{ item.label | translate }}</label
+            <mat-checkbox
+              [checked]="weekdays().includes(item.day)"
+              (change)="toggleWeekday(item.day)"
+              >{{ item.label | translate }}</mat-checkbox
             >
           }
         </fieldset>
       } @else {
-        <label
-          >{{ T.F.CHRONOS.EVENT_START | translate
-          }}<input
+        <mat-form-field
+          ><mat-label>{{
+            (mode() === 'task' ? T.F.CHRONOS.TASK_TIME : T.F.CHRONOS.EVENT_START)
+              | translate
+          }}</mat-label
+          ><input
+            matInput
             class="event-start"
             type="datetime-local"
             name="start"
             [value]="start()"
             (input)="start.set(value($event))"
             required
-        /></label>
-        <label
-          >{{ T.F.CHRONOS.EVENT_END | translate
-          }}<input
-            class="event-end"
-            type="datetime-local"
-            name="end"
-            [value]="end()"
-            (input)="end.set(value($event))"
-            required
-        /></label>
+        /></mat-form-field>
+        @if (mode() !== 'task') {
+          <mat-form-field
+            ><mat-label>{{ T.F.CHRONOS.EVENT_END | translate }}</mat-label
+            ><input
+              matInput
+              class="event-end"
+              type="datetime-local"
+              name="end"
+              [value]="end()"
+              (input)="end.set(value($event))"
+              required
+          /></mat-form-field>
+        }
       }
-      <label
-        >{{ T.F.CHRONOS.REMINDER | translate
-        }}<select
+      <mat-form-field
+        ><mat-label>{{ T.F.CHRONOS.REMINDER | translate }}</mat-label
+        ><select
+          matNativeControl
           class="routine-reminder"
           [value]="reminder()"
           (change)="setReminder($event)"
         >
-          @for (option of options; track option.value) {
+          @for (option of options(); track option.value) {
             <option [value]="option.value">{{ option.label | translate }}</option>
           }
-        </select></label
+        </select></mat-form-field
       >
+      @if (editing()) {
+        <button
+          mat-button
+          type="button"
+          (click)="cancelEdit()"
+        >
+          {{ T.F.CHRONOS.CANCEL_EDIT | translate }}
+        </button>
+      }
       @if (error()) {
         <p class="routine-error">{{ T.F.CHRONOS.ROUTINE_INVALID | translate }}</p>
       }
@@ -132,7 +159,7 @@
         {{ T.F.CHRONOS.ROUTINE_SAVE | translate }}
       </button>
     </form>
-  </details>
+  </mat-expansion-panel>
   @if (habits().length || habitOnly()) {
     <h2 class="habit-heading">{{ T.F.CHRONOS.SCHEDULED_HABITS | translate }}</h2>
     <ul class="scheduled-habits">

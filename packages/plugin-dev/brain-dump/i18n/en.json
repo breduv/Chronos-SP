@@ -1,0 +1,16 @@
+{
+  "TITLE": "Brain Dump",
+  "OPEN": "Open Brain Dump",
+  "CANCEL": "Cancel",
+  "ADD": "Add Tasks",
+  "EMPTY": "Nothing to add — enter at least one task.",
+  "PLACEHOLDER": "One task per line. For sub-tasks, indent with 4 spaces:\n\n- Main task\n    - Sub task\n    - Another sub task\n\nPlain text tasks are also supported.",
+  "HINT": "One task per line. Empty lines are skipped.\n - Use - for bullet points\n    indent 4 spaces for sub-tasks.",
+  "PROJECT": "Project",
+  "NO_PROJECT": "No project",
+  "DATE": "Due date",
+  "COUNT": "Items to add (including subtasks): {{count}}",
+  "ADDED": "Tasks added: {{count}}",
+  "PLAIN": "Plain-text lines will be added as regular tasks: {{count}}",
+  "NESTED": "Nested items moved to the subtask level: {{count}}"
+}

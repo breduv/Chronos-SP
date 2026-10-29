@@ -4,7 +4,7 @@
     <button
       mat-button
       [attr.aria-expanded]="managing()"
-      (click)="managing.set(!managing())"
+      (click)="manage()"
     >
       {{ T.F.CHRONOS.QUICK_MANAGE | translate }}
     </button>
@@ -21,27 +21,28 @@
         {{ task.title }}
       </button>
     }
-    @for (title of suggestions(); track title) {
+    @for (starter of suggestions(); track starter.key) {
       <button
         class="quick-suggestion"
         mat-stroked-button
-        (click)="quick.startSuggested(title)"
+        (click)="quick.startSuggested(starter.title, starter.key)"
       >
-        {{ title }}
+        {{ starter.title }}
       </button>
     }
   </div>
   @if (managing()) {
     <form (submit)="add($event)">
-      <label
-        ><span>{{ T.F.CHRONOS.QUICK_NAME | translate }}</span>
+      <mat-form-field
+        ><mat-label>{{ T.F.CHRONOS.QUICK_NAME | translate }}</mat-label>
         <input
+          matInput
           name="activity"
           [value]="name()"
           (input)="setName($event)"
           required
         />
-      </label>
+      </mat-form-field>
       <button
         mat-flat-button
         color="primary"
@@ -54,11 +55,14 @@
     <ul>
       @for (task of quick.activities(); track task.id) {
         <li>
-          <input
-            [attr.aria-label]="T.F.CHRONOS.QUICK_RENAME | translate"
-            [value]="task.title"
-            (change)="rename(task, $event)"
-          />
+          <mat-form-field
+            ><mat-label>{{ T.F.CHRONOS.QUICK_RENAME | translate }}</mat-label
+            ><input
+              matInput
+              [attr.aria-label]="T.F.CHRONOS.QUICK_RENAME | translate"
+              [value]="task.title"
+              (change)="rename(task, $event)"
+          /></mat-form-field>
           <button
             mat-button
             (click)="quick.unpin(task)"

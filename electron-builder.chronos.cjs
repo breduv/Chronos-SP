@@ -6,7 +6,7 @@ module.exports = {
   extraMetadata: {
     name: 'chronos-sp',
     productName: 'Chronos-SP',
-    version: '19.3.1-chronos.1',
+    version: '19.3.1-chronos.2',
   },
   directories: { output: '.tmp/chronos-builds' },
   win: {
@@ -15,7 +15,7 @@ module.exports = {
     publish: null,
   },
   nsis: {
-    artifactName: 'Chronos-SP-Setup-19.3.1-chronos.1-x64.${ext}',
+    artifactName: 'Chronos-SP-Setup-19.3.1-chronos.2-x64.${ext}',
     shortcutName: 'Chronos-SP',
     uninstallDisplayName: 'Chronos-SP',
   },

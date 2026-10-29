@@ -4,14 +4,15 @@
 >
   <header>
     <h2>{{ T.F.CHRONOS.SESSIONS | translate }}</h2>
-    <label>
-      <span>{{ T.F.CHRONOS.SESSION_DAY | translate }}</span>
+    <mat-form-field>
+      <mat-label>{{ T.F.CHRONOS.SESSION_DAY | translate }}</mat-label>
       <input
+        matInput
         type="date"
         [value]="day()"
         (change)="selectDay($event)"
       />
-    </label>
+    </mat-form-field>
   </header>
   <p class="muted">{{ T.F.CHRONOS.SESSIONS_NOTE | translate }}</p>
   @if (journal.storageFailed()) {

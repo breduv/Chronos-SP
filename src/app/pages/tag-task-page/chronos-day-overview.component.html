@@ -1,8 +1,7 @@
 <header class="day-heading">
   <div>
-    <p class="eyebrow">CHRONOS</p>
     <h1>{{ T.F.CHRONOS.TITLE | translate }}</h1>
-    <p class="day-date">{{ today() }}</p>
+    <p class="day-date">{{ displayDay() }}</p>
   </div>
   <nav [attr.aria-label]="T.F.CHRONOS.NAV | translate">
     @if (features().isSchedulerEnabled) {
@@ -26,21 +25,6 @@
     >
   </nav>
 </header>
-
-<dl class="day-summary">
-  <div>
-    <dt>{{ T.F.CHRONOS.REMAINING | translate }}</dt>
-    <dd>{{ remaining() | msToString }}</dd>
-  </div>
-  <div>
-    <dt>{{ T.F.CHRONOS.RECORDED | translate }}</dt>
-    <dd>{{ recordedTime() | msToString: true }}</dd>
-  </div>
-  <div>
-    <dt>{{ T.F.CHRONOS.COMPLETED | translate }}</dt>
-    <dd>{{ progress().done }} / {{ progress().total }}</dd>
-  </div>
-</dl>
 
 @if (currentTask(); as task) {
   <section
@@ -72,36 +56,6 @@
     <h2>{{ T.F.CHRONOS.PLAN | translate }}</h2>
     <ng-content />
   </section>
-  <aside
-    class="recorded-panel"
-    [attr.aria-label]="T.F.CHRONOS.RECORDED | translate"
-  >
-    <h2>{{ T.F.CHRONOS.RECORDED | translate }}</h2>
-    <p class="muted">{{ T.F.CHRONOS.TOTALS_NOTE | translate }}</p>
-    <ul>
-      @for (task of recordedTasks(); track task.id) {
-        <li>
-          <button
-            class="recorded-task"
-            (click)="editTime(task)"
-            [attr.aria-label]="(T.F.CHRONOS.EDIT_TIME | translate) + ': ' + task.title"
-          >
-            <span>{{ task.title }}</span>
-            <strong class="duration">{{
-              task.timeSpentOnDay[today() || ''] | msToString: true
-            }}</strong>
-          </button>
-        </li>
-      } @empty {
-        <li class="empty-records">{{ T.F.CHRONOS.EMPTY | translate }}</li>
-      }
-    </ul>
-    @if (archivedTime()) {
-      <p class="muted">
-        {{ T.F.CHRONOS.ARCHIVED | translate }}: {{ archivedTime() | msToString }}
-      </p>
-    }
-  </aside>
 </div>
 
 <chronos-session-timeline />

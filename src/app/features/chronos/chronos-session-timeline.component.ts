@@ -7,6 +7,8 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { DateService } from '../../core/date/date.service';
@@ -21,7 +23,13 @@ import { ChronosSessionJournalService } from './chronos-session-journal.service'
   selector: 'chronos-session-timeline',
   templateUrl: './chronos-session-timeline.component.html',
   styleUrl: './chronos-session-timeline.component.scss',
-  imports: [TranslatePipe, LocaleDatePipe, MsToStringPipe],
+  imports: [
+    TranslatePipe,
+    LocaleDatePipe,
+    MsToStringPipe,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChronosSessionTimelineComponent {

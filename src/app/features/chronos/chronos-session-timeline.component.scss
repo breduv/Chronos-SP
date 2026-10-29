@@ -29,14 +29,6 @@ label,
   font-size: var(--font-size-sm);
   color: var(--text-color-muted);
 }
-input {
-  background: var(--bg);
-  color: var(--text-color);
-  border: var(--task-separator);
-  border-radius: var(--radius-md);
-  padding: var(--s);
-  font: inherit;
-}
 p {
   margin: 0;
   line-height: var(--line-height-normal);

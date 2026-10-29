@@ -7,7 +7,7 @@ import {
 import { initialGlobalConfigState } from './store/global-config.reducer';
 
 describe('NEW_INSTALL_APP_FEATURES', () => {
-  it('starts calm: tasks, planner and time tracking, without the extras', () => {
+  it('starts with the calendar and habits required by Chronos', () => {
     expect(NEW_INSTALL_APP_FEATURES).toEqual({
       ...DEFAULT_GLOBAL_CONFIG.appFeatures,
       isTimeTrackingEnabled: true,
@@ -16,10 +16,10 @@ describe('NEW_INSTALL_APP_FEATURES', () => {
       isSearchEnabled: true,
       isSyncIconEnabled: true,
       isDonatePageEnabled: true,
-      isSchedulerEnabled: false,
+      isSchedulerEnabled: true,
       isScheduleDayPanelEnabled: false,
       isBoardsEnabled: false,
-      isHabitsEnabled: false,
+      isHabitsEnabled: true,
       isIssuesPanelEnabled: false,
       isFinishDayEnabled: false,
       isFocusModeEnabled: false,

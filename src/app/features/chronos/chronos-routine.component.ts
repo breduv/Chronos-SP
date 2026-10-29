@@ -1,4 +1,9 @@
 import {
+  TASK_REMINDER_OPTIONS,
+  TASK_REMINDER_OPTIONS_WITHOUT_LONG_LEAD,
+} from '../planner/dialog-schedule-task/task-reminder-options.const';
+import { millisecondsDiffToRemindOption } from '../tasks/util/remind-option-to-milliseconds';
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -8,6 +13,10 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith, map } from 'rxjs/operators';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -26,7 +35,15 @@ import { getChronosDayWindow } from './chronos-session-journal';
   selector: 'chronos-routine',
   templateUrl: './chronos-routine.component.html',
   styleUrl: './chronos-routine.component.scss',
-  imports: [MatButton, TranslatePipe, LocaleDatePipe],
+  imports: [
+    MatButton,
+    TranslatePipe,
+    LocaleDatePipe,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatExpansionModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChronosRoutineComponent {
@@ -41,6 +58,8 @@ export class ChronosRoutineComponent {
     () => this.selectedDay() || this.today() || this._date.todayStr(),
   );
   readonly mode = signal('event');
+  readonly expanded = signal(false);
+  readonly editing = signal<Task | null>(null);
   readonly isHabit = computed(() => this.habitOnly() || this.mode() === 'habit');
   readonly name = signal('');
   readonly start = signal(this._date.todayStr() + 'T09:00');
@@ -50,12 +69,9 @@ export class ChronosRoutineComponent {
   readonly reminder = signal(TaskReminderOptionId.DoNotRemind);
   readonly error = signal(false);
   readonly saving = signal(false);
-  readonly options = [
-    { value: TaskReminderOptionId.DoNotRemind, label: T.F.CHRONOS.REMIND_NONE },
-    { value: TaskReminderOptionId.AtStart, label: T.F.CHRONOS.REMIND_AT_START },
-    { value: TaskReminderOptionId.m5, label: T.F.CHRONOS.REMIND_5 },
-    { value: TaskReminderOptionId.m15, label: T.F.CHRONOS.REMIND_15 },
-  ];
+  readonly options = computed(() =>
+    this.isHabit() ? TASK_REMINDER_OPTIONS_WITHOUT_LONG_LEAD : TASK_REMINDER_OPTIONS,
+  );
   readonly days = [
     { day: 1, label: T.F.CHRONOS.MON },
     { day: 2, label: T.F.CHRONOS.TUE },
@@ -73,10 +89,7 @@ export class ChronosRoutineComponent {
     { initialValue: this._date.getStartOfNextDayDiffMs() },
   );
   readonly planned = computed(() => {
-    const [start, end] = getChronosDayWindow(
-      this.day(),
-      this._date.getStartOfNextDayDiffMs(),
-    );
+    const [start, end] = getChronosDayWindow(this.day(), this._dayOffset());
     return this.routine
       .allTasks()
       .filter(
@@ -97,7 +110,7 @@ export class ChronosRoutineComponent {
   readonly habits = computed(() =>
     this.routine.habits().map((config) => ({
       config,
-      task: this.routine.taskForHabit(config, this.today() || this._date.todayStr()),
+      task: this.routine.taskForHabit(config, this.day()),
     })),
   );
   value(event: Event): string {
@@ -121,24 +134,38 @@ export class ChronosRoutineComponent {
   }
   async save(event: Event): Promise<void> {
     event.preventDefault();
+    if (this.saving()) return;
     this.saving.set(true);
     this.error.set(false);
     try {
-      const id = this.isHabit()
-        ? this.routine.addHabit({
-            title: this.name(),
-            time: this.time(),
-            weekdays: this.weekdays(),
-            reminder: this.reminder(),
-          })
-        : await this.routine.addEvent({
-            title: this.name(),
-            start: this.start(),
-            end: this.end(),
-            reminder: this.reminder(),
-          });
-      if (id) this.name.set('');
-      else this.error.set(true);
+      const eventInput = {
+        title: this.name(),
+        start: this.start(),
+        end: this.end(),
+        reminder: this.reminder(),
+      };
+      const editing = this.editing();
+      const id = editing
+        ? this.routine.updateEvent(editing, eventInput)
+        : this.mode() === 'task' && !this.habitOnly()
+          ? await this.routine.addTask(eventInput)
+          : this.isHabit()
+            ? this.routine.addHabit({
+                title: this.name(),
+                time: this.time(),
+                weekdays: this.weekdays(),
+                reminder: this.reminder(),
+              })
+            : await this.routine.addEvent({
+                title: this.name(),
+                start: this.start(),
+                end: this.end(),
+                reminder: this.reminder(),
+              });
+      if (id) {
+        this.name.set('');
+        this.editing.set(null);
+      } else this.error.set(true);
     } catch {
       this.error.set(true);
     } finally {
@@ -151,6 +178,27 @@ export class ChronosRoutineComponent {
     this._dialog.open(DialogEditTaskRepeatCfgComponent, { data: { repeatCfg: config } });
   }
   editTask(task: Task): void {
-    this._dialog.open(DialogScheduleTaskComponent, { data: { task, minDate: null } });
+    if (!task.hasPlannedTime || !task.timeEstimate || !task.dueWithTime) {
+      this._dialog.open(DialogScheduleTaskComponent, { data: { task, minDate: null } });
+      return;
+    }
+    const local = (value: number): string => {
+      const date = new Date(value);
+      const offsetMs = date.getTimezoneOffset() * 60000;
+      return new Date(value - offsetMs).toISOString().slice(0, 16);
+    };
+    this.editing.set(task);
+    this.mode.set('event');
+    this.name.set(task.title);
+    this.start.set(local(task.dueWithTime));
+    this.end.set(local(task.dueWithTime + task.timeEstimate));
+    this.reminder.set(millisecondsDiffToRemindOption(task.dueWithTime, task.remindAt));
+    this.error.set(false);
+    this.expanded.set(true);
+  }
+  cancelEdit(): void {
+    this.editing.set(null);
+    this.name.set('');
+    this.error.set(false);
   }
 }

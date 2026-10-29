@@ -1,3 +1,4 @@
+import { toPersistableRemindOption } from '../planner/dialog-schedule-task/task-reminder-options.const';
 import { Injectable, computed, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { DateService } from '../../core/date/date.service';
@@ -12,6 +13,7 @@ import {
 } from '../task-repeat-cfg/task-repeat-cfg.model';
 import { selectAllTaskRepeatCfgs } from '../task-repeat-cfg/store/task-repeat-cfg.selectors';
 import { selectAllTasks } from '../tasks/store/task.selectors';
+import { TaskSharedActions } from '../../root-store/meta/task-shared.actions';
 import { getDbDateStr } from '../../util/get-db-date-str';
 
 export interface ChronosEventInput {
@@ -39,6 +41,40 @@ export class ChronosRoutineService {
     this._configs().filter((config) => config.isChronosHabit),
   );
 
+  async addTask(input: Omit<ChronosEventInput, 'end'>): Promise<string | null> {
+    const start = new Date(input.start).getTime();
+    if (!input.title.trim() || !Number.isFinite(start)) return null;
+    return this._tasks.addAndSchedule(
+      input.title.trim(),
+      { projectId: INBOX_PROJECT.id },
+      start,
+      input.reminder,
+      true,
+    );
+  }
+  updateEvent(task: Task, input: ChronosEventInput): boolean {
+    const start = new Date(input.start).getTime();
+    const end = new Date(input.end).getTime();
+    if (
+      !input.title.trim() ||
+      !Number.isFinite(start) ||
+      !Number.isFinite(end) ||
+      end <= start
+    )
+      return false;
+    this._tasks.update(task.id, {
+      title: input.title.trim(),
+      timeEstimate: end - start,
+      hasPlannedTime: true,
+    });
+    if (
+      input.reminder === TaskReminderOptionId.DoNotRemind &&
+      task.remindAt !== undefined
+    )
+      this._store.dispatch(TaskSharedActions.dismissReminderOnly({ id: task.id }));
+    this._tasks.scheduleTask(task, start, input.reminder, false);
+    return true;
+  }
   async addEvent(input: ChronosEventInput): Promise<string | null> {
     const start = new Date(input.start).getTime();
     const end = new Date(input.end).getTime();
@@ -83,7 +119,7 @@ export class ChronosRoutineService {
       quickSetting: 'CUSTOM',
       startDate: this._date.todayStr(),
       startTime: input.time,
-      remindAt: input.reminder,
+      remindAt: toPersistableRemindOption(input.reminder),
       // Missed habits don't become a growing pile of overdue daily tasks.
       skipOverdue: true,
     });

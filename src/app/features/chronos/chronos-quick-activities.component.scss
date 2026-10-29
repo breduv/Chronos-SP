@@ -25,32 +25,9 @@ h2 {
   font-weight: var(--font-weight-semibold);
 }
 p,
-label {
-  font-size: var(--font-size-sm);
-  color: var(--text-color-muted);
-}
-p {
-  margin: var(--s) 0 var(--s2);
-  line-height: var(--line-height-normal);
-}
-form {
-  margin-top: var(--s2);
-}
-label {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--s);
-}
-input {
+mat-form-field {
   min-width: 0;
   max-width: 100%;
-  padding: var(--s);
-  border: var(--task-separator);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text-color);
-  font: inherit;
 }
 ul {
   list-style: none;

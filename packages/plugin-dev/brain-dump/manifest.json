@@ -1,10 +1,10 @@
 {
-  "name": "Brain Dump",
+  "name": "Быстрый ввод задач",
   "id": "brain-dump",
   "manifestVersion": 1,
   "version": "1.0.0",
   "minSupVersion": "13.0.0",
-  "description": "Quickly capture many tasks at once. Each line becomes a task.",
+  "description": "Добавляй несколько задач сразу: каждая строка становится задачей. Поддерживаются подзадачи и сохранение черновика.",
   "author": "Super Productivity",
   "permissions": [
     "getAllProjects",
@@ -17,5 +17,8 @@
   "hooks": [],
   "iFrame": false,
   "isSkipMenuEntry": true,
-  "icon": "icon.svg"
+  "icon": "icon.svg",
+  "i18n": {
+    "languages": ["en", "ru"]
+  }
 }

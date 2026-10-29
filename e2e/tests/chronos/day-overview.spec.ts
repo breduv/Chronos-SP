@@ -1,7 +1,8 @@
 import { test, expect } from '../../fixtures/test.fixture';
+import { flushPendingWrites } from '../../utils/waits';
 
 test.describe('Chronos day overview', () => {
-  test('records, pauses and corrects task time with persistence after reload', async ({
+  test('records and pauses activities without estimate comparison panels', async ({
     page,
     workViewPage,
     taskPage,
@@ -12,21 +13,15 @@ test.describe('Chronos day overview', () => {
     await task.hover();
     await task.locator('.start-task-btn').click();
     await expect(page.locator('.current-activity')).toContainText('Chronos walk');
-    const recorded = page.locator('.recorded-task').filter({ hasText: 'Chronos walk' });
-    await expect(recorded).toBeVisible();
+    await expect(page.locator('.session-running .duration')).toHaveText(/[1-9]/);
     await page.locator('.current-activity button').click();
     await expect(page.locator('.current-activity')).toHaveCount(0);
-    await recorded.click();
-    const dialog = page.locator('dialog-time-estimate');
-    const timeInput = dialog.locator('input-duration-slider input').first();
-    await timeInput.fill('30m');
-    await timeInput.press('Tab');
-    await dialog.locator('button[type="submit"]').click();
-    await expect(dialog).toHaveCount(0);
-    await expect(recorded.locator('.duration')).toHaveText('30m');
-    await expect(page.locator('.day-summary')).toContainText('30m');
+    await expect(page.locator('.session-entry')).toContainText('Chronos walk');
+    await expect(page.locator('.day-summary')).toHaveCount(0);
+    await expect(page.locator('.recorded-panel')).toHaveCount(0);
+    await flushPendingWrites(page);
     await page.reload();
-    await expect(recorded.locator('.duration')).toHaveText('30m');
+    await expect(page.locator('.session-entry')).toContainText('Chronos walk');
     await expect(page.locator('.current-activity')).toHaveCount(0);
     await page.screenshot({ path: '.tmp/chronos-desktop.png', fullPage: true });
   });
@@ -38,7 +33,7 @@ test.describe('Chronos day overview', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await workViewPage.waitForTaskList();
     await expect(page.locator('chronos-day-overview')).toBeVisible();
-    await expect(page.locator('.recorded-panel')).toBeVisible();
+    await expect(page.locator('chronos-routine')).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(391);

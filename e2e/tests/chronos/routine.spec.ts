@@ -9,7 +9,7 @@ test.describe('Chronos day schedule and habit reminders', () => {
     await workViewPage.waitForTaskList();
     const routine = page.locator('chronos-routine');
     await routine.locator('.routine-day').fill('2099-01-05');
-    await routine.locator('summary').click();
+    await routine.locator('mat-expansion-panel-header').click();
     await routine.locator('.routine-name').fill('Пара по математике');
     await routine.locator('.event-start').fill('2099-01-05T09:00');
     await routine.locator('.event-end').fill('2099-01-05T10:30');
@@ -32,7 +32,13 @@ test.describe('Chronos day schedule and habit reminders', () => {
     ).toBeLessThanOrEqual(391);
     await page.screenshot({ path: '.tmp/chronos-routine-mobile.png', fullPage: true });
     await event.getByRole('button').click();
-    await expect(page.locator('dialog-schedule-task')).toBeVisible();
+    await routine.locator('.event-end').fill('2099-01-05T11:15');
+    await routine.locator('button[type="submit"]').click();
+    await expect(event).toContainText('11:15');
+    await flushPendingWrites(page);
+    await page.reload();
+    await routine.locator('.routine-day').fill('2099-01-05');
+    await expect(event).toContainText('11:15');
   });
 
   test('creates a habit with weekdays and a reminder, marks it done and pauses the series', async ({
@@ -42,7 +48,7 @@ test.describe('Chronos day schedule and habit reminders', () => {
     await workViewPage.waitForTaskList();
     await page.goto('/#/habits');
     const routine = page.locator('habit-page chronos-routine');
-    await routine.locator('summary').click();
+    await routine.locator('mat-expansion-panel-header').click();
     await routine.locator('.routine-name').fill('Читать перед сном');
     await routine.locator('.habit-time').fill('23:59');
     for (const box of await routine.locator('fieldset input[type="checkbox"]').all())
@@ -53,9 +59,9 @@ test.describe('Chronos day schedule and habit reminders', () => {
       .locator('.scheduled-habits li')
       .filter({ hasText: 'Читать перед сном' });
     await expect(habit).toContainText('23:59');
-    await habit.getByRole('button', { name: 'Выполнить сегодня', exact: true }).click();
+    await habit.getByRole('button', { name: 'Выполнить', exact: true }).click();
     await expect(
-      habit.getByRole('button', { name: 'Сегодня выполнено', exact: true }),
+      habit.getByRole('button', { name: 'Выполнено', exact: true }),
     ).toHaveAttribute('aria-pressed', 'true');
     await habit.getByRole('button', { name: 'Приостановить', exact: true }).click();
     await expect(
@@ -63,7 +69,7 @@ test.describe('Chronos day schedule and habit reminders', () => {
     ).toBeVisible();
     await flushPendingWrites(page);
     await page.reload();
-    await expect(habit).toContainText('Сегодня выполнено');
+    await expect(habit).toContainText('Выполнено');
     await expect(habit).toContainText('Возобновить');
     await page.screenshot({ path: '.tmp/chronos-habits.png', fullPage: true });
   });
@@ -96,7 +102,7 @@ test.describe('Chronos day schedule and habit reminders', () => {
       return { start: format(start), end: format(end) };
     });
     const routine = page.locator('tag-task-page chronos-routine');
-    await routine.locator('summary').click();
+    await routine.locator('mat-expansion-panel-header').click();
     await routine.locator('.routine-name').fill('Напомнить о занятии');
     await routine.locator('.event-start').fill(times.start);
     await routine.locator('.event-end').fill(times.end);
@@ -106,5 +112,24 @@ test.describe('Chronos day schedule and habit reminders', () => {
       'Напомнить о занятии',
       { timeout: 30000 },
     );
+  });
+  test('adds a reminder task without an end time', async ({ page, workViewPage }) => {
+    await workViewPage.waitForTaskList();
+    const routine = page.locator('chronos-routine');
+    await routine.locator('.routine-day').fill('2099-01-05');
+    await routine.locator('mat-expansion-panel-header').click();
+    await routine.locator('.routine-kind').selectOption('task');
+    await routine.locator('.routine-name').fill('Позвонить');
+    await expect(routine.locator('.event-end')).toHaveCount(0);
+    await routine.locator('.event-start').fill('2099-01-05T14:00');
+    await routine.locator('.routine-reminder').selectOption('AtStart');
+    await routine.locator('button[type="submit"]').click();
+    const task = routine.locator('.planned-slots li').filter({ hasText: 'Позвонить' });
+    await expect(task).toContainText('14:00');
+    await expect(task).not.toContainText('—');
+    await flushPendingWrites(page);
+    await page.reload();
+    await routine.locator('.routine-day').fill('2099-01-05');
+    await expect(task).toBeVisible();
   });
 });

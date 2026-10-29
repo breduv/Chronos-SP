@@ -67,3 +67,7 @@ export const BUNDLED_PLUGIN_IDS = new Set<string>([
 export const DEV_ONLY_BUNDLED_PLUGIN_IDS: ReadonlySet<string> = new Set([
   'api-test-plugin',
 ]);
+
+export const DEFAULT_ENABLED_BUNDLED_PLUGIN_IDS: ReadonlySet<string> = new Set([
+  'brain-dump',
+]);

@@ -1,3 +1,7 @@
+function _bdT(key, params) {
+  return PluginAPI.translate(key, params);
+}
+
 // Brain Dump Plugin - Quickly capture many tasks at once
 
 var _bdIntervals = { save: null, check: null };
@@ -52,10 +56,7 @@ function parseTasksWithSubTasks(text) {
 
   if (hasBullets && hasPlainText) {
     PluginAPI.showSnack({
-      msg:
-        'Warning: ' +
-        plainTextCount +
-        ' plain-text line(s) detected. These will be added as regular tasks.',
+      msg: _bdT('PLAIN', { count: plainTextCount }),
       type: 'WARNING',
     });
   }
@@ -138,9 +139,7 @@ function parseTasksWithSubTasks(text) {
   // Show warning for deeply-nested items
   if (deeplyNestedWarnings.length > 0) {
     PluginAPI.showSnack({
-      msg:
-        deeplyNestedWarnings.length +
-        ' deeply-nested item(s) flattened to sub-task level. Sub-tasks in Super Productivity do not support nesting.',
+      msg: _bdT('NESTED', { count: deeplyNestedWarnings.length }),
       type: 'INFO',
     });
   }
@@ -257,22 +256,27 @@ async function openBrainDump() {
     .join('');
 
   // SUGGESTION: Expose expected format to users
-  var placeholderText =
-    'One task per line. For sub-tasks, indent with 4 spaces:\n\n- Main task\n    - Sub task\n    - Another sub task\n\nPlain text tasks are also supported.';
+  var placeholderText = _bdT('PLACEHOLDER');
 
   var html =
     '<div id="bd-container" style="padding:4px 0">' +
     '<div style="display:flex;gap:12px;margin-bottom:12px">' +
     '<div style="flex:1">' +
-    '<label for="bd-project" style="display:block;margin-bottom:4px;font-size:12px;opacity:0.7">Project</label>' +
+    '<label for="bd-project" style="display:block;margin-bottom:4px;font-size:12px;opacity:0.7">' +
+    escapeHtml(_bdT('PROJECT')) +
+    '</label>' +
     '<select id="bd-project" style="width:100%">' +
-    '<option value="">No project</option>' +
+    '<option value="">' +
+    escapeHtml(_bdT('NO_PROJECT')) +
+    '</option>' +
     projectOptions +
     '</select>' +
     '<div id="bd-color-bar" style="height:3px;margin-top:4px;border-radius:2px"></div>' +
     '</div>' +
     '<div>' +
-    '<label for="bd-due" style="display:block;margin-bottom:4px;font-size:12px;opacity:0.7">Due date</label>' +
+    '<label for="bd-due" style="display:block;margin-bottom:4px;font-size:12px;opacity:0.7">' +
+    escapeHtml(_bdT('DATE')) +
+    '</label>' +
     '<input type="date" id="bd-due" value="' +
     escapeHtml(savedDueDay) +
     '" style="width:100%">' +
@@ -290,18 +294,18 @@ async function openBrainDump() {
   var lastSavedText = savedText;
 
   PluginAPI.openDialog({
-    title: 'Brain Dump',
+    title: _bdT('TITLE'),
     htmlContent: html,
     buttons: [
       {
-        label: 'Cancel',
+        label: _bdT('CANCEL'),
         onClick: function () {
           _bdCleanup();
           return saveDraft();
         },
       },
       {
-        label: 'Add Tasks',
+        label: _bdT('ADD'),
         color: 'primary',
         icon: 'add',
         raised: true,
@@ -343,14 +347,9 @@ function updateStatus() {
   if (!statusEl) return;
   var count = countTasks(textarea);
   if (count === 0) {
-    statusEl.textContent =
-      'One task per line. Empty lines are skipped.\n - Use - for bullet points\n    indent 4 spaces for sub-tasks.';
+    statusEl.textContent = _bdT('HINT');
   } else {
-    statusEl.textContent =
-      count +
-      ' item' +
-      (count !== 1 ? 's' : '') +
-      ' detected (including sub-tasks) to add.';
+    statusEl.textContent = _bdT('COUNT', { count: count });
   }
 }
 
@@ -394,7 +393,7 @@ async function submitTasks() {
   var text = textarea.value.trim();
   if (text.length === 0) {
     PluginAPI.showSnack({
-      msg: 'Nothing to add — enter at least one task.',
+      msg: _bdT('EMPTY'),
       type: 'WARNING',
     });
     return;
@@ -448,7 +447,7 @@ async function submitTasks() {
       }, 0);
 
     PluginAPI.showSnack({
-      msg: totalTasks + ' task' + (totalTasks !== 1 ? 's' : '') + ' added',
+      msg: _bdT('ADDED', { count: totalTasks }),
       type: 'SUCCESS',
       ico: 'check',
     });
@@ -470,7 +469,7 @@ async function submitTasks() {
     }
 
     PluginAPI.showSnack({
-      msg: lines.length + ' task' + (lines.length !== 1 ? 's' : '') + ' added',
+      msg: _bdT('ADDED', { count: lines.length }),
       type: 'SUCCESS',
       ico: 'check',
     });
@@ -485,13 +484,13 @@ async function submitTasks() {
 
 // Register menu entry and shortcut
 PluginAPI.registerMenuEntry({
-  label: 'Brain Dump',
+  label: _bdT('TITLE'),
   icon: 'lightbulb',
   onClick: openBrainDump,
 });
 
 PluginAPI.registerShortcut({
   id: 'open-brain-dump',
-  label: 'Open Brain Dump',
+  label: _bdT('OPEN'),
   onExec: openBrainDump,
 });

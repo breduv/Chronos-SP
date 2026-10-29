@@ -18,7 +18,7 @@ bash tools/chronos-package.sh all
 ```
 
 The builder configuration is [electron-builder.chronos.cjs](../electron-builder.chronos.cjs).
-Outputs are `.tmp/chronos-builds/Chronos-SP-Setup-19.3.1-chronos.1-x64.exe`
+Outputs are `.tmp/chronos-builds/Chronos-SP-Setup-19.3.1-chronos.2-x64.exe`
 and `android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`.
 Android staging is replaced before copying, so chunks from older frontend builds
 do not remain in the APK.

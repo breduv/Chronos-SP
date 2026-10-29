@@ -52,4 +52,16 @@ describe('PluginMetaPersistenceService', () => {
       }),
     );
   });
+  it('enables quick capture by default without persisting a bootstrap choice', async () => {
+    expect(await service.isPluginEnabled('brain-dump')).toBeTrue();
+    expect(await service.isPluginEnabled('voice-reminder')).toBeFalse();
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
+  it('preserves an explicit choice to disable quick capture', async () => {
+    store.overrideSelector(selectPluginMetadataFeatureState, [
+      { id: 'brain-dump', isEnabled: false },
+    ]);
+    store.refreshState();
+    expect(await service.isPluginEnabled('brain-dump')).toBeFalse();
+  });
 });

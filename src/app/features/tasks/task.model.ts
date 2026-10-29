@@ -99,6 +99,7 @@ export interface TaskCopy
 
   /** Reusable one-tap activity in Chronos. Missing means a normal task. */
   isChronosQuickActivity?: boolean;
+  chronosQuickStarterKey?: string;
 
   // Additional app-specific fields
 

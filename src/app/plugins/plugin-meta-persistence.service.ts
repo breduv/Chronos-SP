@@ -1,3 +1,4 @@
+import { DEFAULT_ENABLED_BUNDLED_PLUGIN_IDS } from './bundled-plugins.const';
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { firstValueFrom } from 'rxjs';
@@ -33,9 +34,8 @@ export class PluginMetaPersistenceService {
     );
     const pluginMetadata = currentState.find((item) => item.id === pluginId);
 
-    // Default to false for all plugins that haven't been explicitly enabled
-    // This ensures plugins start disabled and must be manually enabled by the user
-    return pluginMetadata?.isEnabled ?? false;
+    // A saved choice always wins over the bundled default.
+    return pluginMetadata?.isEnabled ?? DEFAULT_ENABLED_BUNDLED_PLUGIN_IDS.has(pluginId);
   }
 
   /**

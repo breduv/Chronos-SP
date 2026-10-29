@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 import { ChronosRoutineService } from './chronos-routine.service';
 import { TaskService } from '../tasks/task.service';
-import { TaskReminderOptionId } from '../tasks/task.model';
+import { DEFAULT_TASK, TaskReminderOptionId } from '../tasks/task.model';
 import { TaskRepeatCfgService } from '../task-repeat-cfg/task-repeat-cfg.service';
 import { DateService } from '../../core/date/date.service';
 import { selectAllTaskRepeatCfgs } from '../task-repeat-cfg/store/task-repeat-cfg.selectors';
@@ -16,6 +16,7 @@ describe('ChronosRoutineService', () => {
     tasks = jasmine.createSpyObj<TaskService>('tasks', [
       'add',
       'addAndSchedule',
+      'scheduleTask',
       'update',
     ]);
     tasks.add.and.returnValue('habit-task');
@@ -121,5 +122,46 @@ describe('ChronosRoutineService', () => {
       }),
     ).toBeNull();
     expect(tasks.add).not.toHaveBeenCalled();
+  });
+  it('creates a reminder task without an estimated duration', async () => {
+    await service.addTask({
+      title: 'Call',
+      start: '2026-10-30T12:00',
+      reminder: TaskReminderOptionId.AtStart,
+    });
+    expect(tasks.addAndSchedule).toHaveBeenCalledWith(
+      'Call',
+      { projectId: 'INBOX_PROJECT' },
+      new Date('2026-10-30T12:00').getTime(),
+      TaskReminderOptionId.AtStart,
+      true,
+    );
+  });
+  it('edits the end of an existing event and reschedules its reminder', () => {
+    const task = {
+      ...DEFAULT_TASK,
+      id: 'class',
+      title: 'Class',
+      projectId: 'INBOX_PROJECT',
+    };
+    expect(
+      service.updateEvent(task, {
+        title: 'Class',
+        start: '2026-10-30T09:00',
+        end: '2026-10-30T11:00',
+        reminder: TaskReminderOptionId.m15,
+      }),
+    ).toBeTrue();
+    expect(tasks.update).toHaveBeenCalledWith('class', {
+      title: 'Class',
+      timeEstimate: 7200000,
+      hasPlannedTime: true,
+    });
+    expect(tasks.scheduleTask).toHaveBeenCalledWith(
+      task,
+      new Date('2026-10-30T09:00').getTime(),
+      TaskReminderOptionId.m15,
+      false,
+    );
   });
 });

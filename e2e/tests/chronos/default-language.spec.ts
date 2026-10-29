@@ -10,7 +10,8 @@ test.describe('Chronos default language', () => {
   }) => {
     await workViewPage.waitForTaskList();
     await expect(page.locator('.day-heading h1')).toHaveText('Мой день');
-    await expect(page.locator('.recorded-panel h2')).toHaveText('Учтённое время');
+    await expect(page.locator('.day-plan h2')).toHaveText('Задачи на сегодня');
+    await expect(page.locator('.day-date')).toHaveText(/^\d{2}\.\d{2}\.\d{4}$/);
     await page.reload();
     await expect(page.locator('.day-heading h1')).toHaveText('Мой день');
     await page.screenshot({ path: '.tmp/chronos-russian.png', fullPage: true });

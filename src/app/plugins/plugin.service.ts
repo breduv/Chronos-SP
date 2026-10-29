@@ -44,7 +44,11 @@ import {
   logSkippedPluginTranslations,
   readPluginTranslationsFromZip,
 } from './util/read-plugin-translations-from-zip.util';
-import { BUNDLED_PLUGIN_IDS, BUNDLED_PLUGIN_PATHS } from './bundled-plugins.const';
+import {
+  BUNDLED_PLUGIN_IDS,
+  BUNDLED_PLUGIN_PATHS,
+  DEFAULT_ENABLED_BUNDLED_PLUGIN_IDS,
+} from './bundled-plugins.const';
 
 /**
  * Thrown by `_fireOnReady` when the user explicitly DENIES a nodeExecution consent
@@ -136,7 +140,6 @@ export class PluginService implements OnDestroy {
       'assets/bundled-plugins/ai-productivity-prompts', // discover-only
     ];
 
-    // Only load manifests for discovery
     for (const path of pluginPaths) {
       try {
         const manifestUrl = `${path}/manifest.json`;
@@ -190,7 +193,6 @@ export class PluginService implements OnDestroy {
             }
           }
 
-          // Create plugin state without loading code
           const state: PluginState = {
             manifest,
             status: 'not-loaded',
@@ -202,7 +204,6 @@ export class PluginService implements OnDestroy {
           this._setPluginState(manifest.id, state);
           this._pluginPaths.set(manifest.id, path);
 
-          // Load icon if available
           try {
             const iconUrl = `${path}/${manifest.icon || 'icon.svg'}`;
             const icon = await this._http
@@ -255,7 +256,6 @@ export class PluginService implements OnDestroy {
           }
           this._assertUploadedPluginAllowed(manifest);
 
-          // Create plugin state without loading code
           const state: PluginState = {
             manifest,
             status: 'not-loaded',
@@ -801,13 +801,12 @@ export class PluginService implements OnDestroy {
     const allPluginMetadata =
       await this._pluginMetaPersistenceService.getAllPluginMetadata();
 
-    // Update loaded plugins with persistence state
     for (const plugin of loadedPlugins) {
       const metadata = allPluginMetadata.find((data) => data.id === plugin.manifest.id);
-      plugin.isEnabled = metadata?.isEnabled ?? false;
+      plugin.isEnabled =
+        metadata?.isEnabled ?? DEFAULT_ENABLED_BUNDLED_PLUGIN_IDS.has(plugin.manifest.id);
     }
 
-    // Add disabled plugins that aren't loaded
     for (const pluginMetadata of allPluginMetadata) {
       const isAlreadyLoaded = loadedPlugins.some(
         (p) => p.manifest.id === pluginMetadata.id,

@@ -88,4 +88,21 @@ describe('ChronosQuickActivitiesService', () => {
     expect(tasks.update).toHaveBeenCalledWith('travel', { isChronosQuickActivity: true });
     expect(tasks.add).not.toHaveBeenCalled();
   });
+  it('keeps a starter identity when renamed or unpinned', () => {
+    service.rename(activity, 'Home', 'F.CHRONOS.QUICK_TRAVEL');
+    expect(tasks.update).toHaveBeenCalledWith('travel', {
+      title: 'Home',
+      chronosQuickStarterKey: 'F.CHRONOS.QUICK_TRAVEL',
+    });
+    store.overrideSelector(selectAllTasks, [
+      {
+        ...activity,
+        title: 'Home',
+        isChronosQuickActivity: false,
+        chronosQuickStarterKey: 'F.CHRONOS.QUICK_TRAVEL',
+      },
+    ]);
+    store.refreshState();
+    expect(service.starterKeys()).toContain('F.CHRONOS.QUICK_TRAVEL');
+  });
 });

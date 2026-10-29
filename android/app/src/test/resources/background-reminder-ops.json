@@ -353,6 +353,7 @@
           "doneOn",
           "wontDoOn",
           "isChronosQuickActivity",
+          "chronosQuickStarterKey",
           "parentId",
           "repeatCfgId",
           "_hideSubTasksMode",
