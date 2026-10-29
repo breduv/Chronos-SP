@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.super-productivity.app',
-  appName: 'Super Productivity',
+  appId: 'io.github.breduv.chronossp',
+  appName: 'Chronos-SP',
   webDir: 'dist/browser',
   plugins: {
     CapacitorHttp: {

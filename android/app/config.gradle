@@ -20,7 +20,7 @@ ext.loadAppConfig = {
 // Determine the build configuration fields based on the build type (Debug or Release)
 ext.getBuildConfigFields = { appConfig, isDebugBuild ->
     // LAUNCH_MODE determines the launch behavior
-    def launchMode = appConfig.getProperty("LAUNCH_MODE", "0")
+    def launchMode = project.findProperty("chronosLaunchMode") ?: appConfig.getProperty("LAUNCH_MODE", "0")
 
     // ONLINE_SERVICE_IS_LOCAL remains as a string for comparison
     def serviceIsLocal = appConfig.getProperty("ONLINE_SERVICE_IS_LOCAL", "true")

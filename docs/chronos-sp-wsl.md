@@ -28,3 +28,6 @@ Open the source from Windows at
 Validated on 2026-10-28: development build, changed-file checks, translation
 checks, 18,921 Angular tests plus 6,377 in the additional timezone, and two
 Chromium scenarios covering time corrections, reload and a 390px layout.
+
+For standalone Windows and Android installers, see the
+[personal packaging guide](chronos-sp-packaging.md).

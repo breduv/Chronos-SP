@@ -16,17 +16,17 @@ def releaseConfigFields = getBuildConfigFields(appConfig, false)
 
 android {
     defaultConfig {
-        applicationId "com.superproductivity.superproductivity"
+        applicationId "io.github.breduv.chronossp"
         minSdkVersion 24
         targetSdkVersion 36
         compileSdk 36
-        versionCode 19_03_01_9000
-        versionName "19.3.1"
+        versionCode 19_03_01_9001
+        versionName "19.3.1-chronos.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 hostName       : "app.super-productivity.com",
                 defaultUrl     : "https://app.super-productivity.com",
-                launcherName   : "Super Productivity",
+                launcherName   : "Chronos-SP",
                 assetStatements: '[{ "relation": ["delegate_permission/common.handle_all_urls"], ' +
                         '"target": {"namespace": "web", "site": "https://app.super-productivity.com"}}]'
         ]
@@ -34,7 +34,7 @@ android {
 
     signingConfigs{
         release{
-            storeFile file("../../keystore.jks")
+            storeFile file(System.getenv("RELEASE_KEYSTORE_FILE") ?: "../../keystore.jks")
             storePassword System.getenv("RELEASE_KEYSTORE_PASSWORD")
             keyAlias System.getenv("RELEASE_KEYSTORE_ALIAS")
             keyPassword System.getenv("RELEASE_KEY_PASSWORD")

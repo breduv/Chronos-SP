@@ -24,8 +24,8 @@ const readRoot = (...p) => readFileSync(join(ROOT, ...p), 'utf8').replace(/\r\n/
 const RES = ['android', 'app', 'src', 'main', 'res'];
 
 const SCHEME = 'com.super-productivity.app';
-const PACKAGE = 'com.superproductivity.superproductivity';
-const TRAMPOLINE = `${PACKAGE}.AppShortcutActivity`;
+const PACKAGE = 'io.github.breduv.chronossp';
+const TRAMPOLINE = 'com.superproductivity.superproductivity.AppShortcutActivity';
 
 const SHORTCUTS = readRoot(...RES, 'xml', 'shortcuts.xml');
 const STRINGS = readRoot(...RES, 'values', 'strings.xml');

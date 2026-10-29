@@ -4,7 +4,7 @@
     <!-- Prevent restored legacy launch_mode from pinning fresh installs to online mode. -->
     <exclude
       domain="sharedpref"
-      path="com.superproductivity.superproductivity_preferences.xml" />
+      path="io.github.breduv.chronossp_preferences.xml" />
     <!-- Keystore-bound ciphertext; see backup_rules.xml. -->
     <exclude
       domain="sharedpref"
@@ -26,7 +26,7 @@
     <!-- A transferred fresh install should select launch mode from current state. -->
     <exclude
       domain="sharedpref"
-      path="com.superproductivity.superproductivity_preferences.xml" />
+      path="io.github.breduv.chronossp_preferences.xml" />
     <!-- Keystore-bound ciphertext; see backup_rules.xml. -->
     <exclude
       domain="sharedpref"

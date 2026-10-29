@@ -1,6 +1,6 @@
 <resources>
-  <string name="app_name">Super Productivity</string>
-  <string name="title_activity_fullscreen">Super Prod</string>
+  <string name="app_name">Chronos-SP</string>
+  <string name="title_activity_fullscreen">Chronos-SP</string>
   <string name="webview_block_message">Please update Android System WebView to version %1$d or newer.</string>
   <string name="webview_init_failure_message">Super Productivity could not start Android System WebView.</string>
   <string name="webview_init_failure_details_with_provider">This is not an outdated WebView version. Android reports WebView provider details, but the provider fails to start. This is most often fixed by resetting the active WebView provider app: open the provider app settings below, then tap Storage → Clear storage and reopen Super Productivity. Updating Android System WebView or switching away from a beta provider can also help. Clearing provider storage does not delete your Super Productivity tasks, but it may affect that provider app\'s own browser or app data. Exporting a backup first is a sensible precaution.</string>
