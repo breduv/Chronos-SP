@@ -1,0 +1,47 @@
+<section
+  class="session-journal"
+  [attr.aria-label]="T.F.CHRONOS.SESSIONS | translate"
+>
+  <header>
+    <h2>{{ T.F.CHRONOS.SESSIONS | translate }}</h2>
+    <label>
+      <span>{{ T.F.CHRONOS.SESSION_DAY | translate }}</span>
+      <input
+        type="date"
+        [value]="day()"
+        (change)="selectDay($event)"
+      />
+    </label>
+  </header>
+  <p class="muted">{{ T.F.CHRONOS.SESSIONS_NOTE | translate }}</p>
+  @if (journal.storageFailed()) {
+    <p class="callout callout--warning">
+      {{ T.F.CHRONOS.SESSIONS_STORAGE_ERROR | translate }}
+    </p>
+  }
+  <ol>
+    @for (entry of finished(); track entry.taskId + ':' + entry.start) {
+      <li class="session-entry">
+        <span class="session-range"
+          >{{ entry.start | localeDate: 'mediumTime' }} —
+          {{ entry.end | localeDate: 'mediumTime' }}</span
+        >
+        <strong>{{ entry.title }}</strong>
+        <span class="duration">{{ entry.end - entry.start | msToString: true }}</span>
+      </li>
+    }
+    @if (running(); as entry) {
+      <li class="session-entry session-running">
+        <span class="session-range"
+          >{{ entry.start | localeDate: 'mediumTime' }} —
+          {{ T.F.CHRONOS.NOW | translate }}</span
+        >
+        <strong>{{ entry.title }}</strong>
+        <span class="duration">{{ entry.end - entry.start | msToString: true }}</span>
+      </li>
+    }
+  </ol>
+  @if (!finished().length && !running()) {
+    <p class="empty-sessions">{{ T.F.CHRONOS.SESSIONS_EMPTY | translate }}</p>
+  }
+</section>

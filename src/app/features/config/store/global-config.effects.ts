@@ -144,13 +144,10 @@ export class GlobalConfigEffects {
         map((config) => config.lng),
         distinctUntilChanged(),
         tap((lng) => {
-          if (lng === undefined) {
-            // Initial state - try autoswitch first, then detect browser language
-            const autoswitched = this._languageService.tryAutoswitch();
-            if (!autoswitched) this._languageService.setLng();
-          } else {
-            this._languageService.setLng(lng);
-          }
+          // Missing means no preference yet. Null explicitly selects the system language.
+          this._languageService.setLng(
+            lng === undefined ? DEFAULT_GLOBAL_CONFIG.localization.lng : lng,
+          );
         }),
       ),
     { dispatch: false },

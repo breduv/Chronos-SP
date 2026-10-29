@@ -123,6 +123,13 @@ export enum LS {
   // Tracked work sessions not yet added to the calendar. Device-local, never
   // synced: only the device that tracked the time adds the event.
   WORK_SESSION_LOG = 'SUP_WORK_SESSION_LOG',
+
+  // Legacy local history and current checkpoint/outbox. Finished history lives
+  // in the normal synced model; these support crash recovery before publication.
+  CHRONOS_SESSIONS = 'CHRONOS_SESSIONS',
+  CHRONOS_OPEN_SESSION = 'CHRONOS_OPEN_SESSION',
+  CHRONOS_HISTORY_OUTBOX = 'CHRONOS_HISTORY_OUTBOX',
+  CHRONOS_ORIGIN = 'CHRONOS_ORIGIN',
 }
 
 // Prefix for device-local, never-synced note drafts (see LocalDraftService).

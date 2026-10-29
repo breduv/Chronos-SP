@@ -38,3 +38,9 @@ remain separate work. Logical day boundaries use the existing store clock.
 Ubuntu 24.04 in WSL, source at `~/projects/Chronos-SP`, Node from `.nvmrc`.
 Dependencies and browser-test tools live inside Linux. The Windows checkout is
 an initial clone; this prototype's working copy is the Linux repository.
+
+## Follow-up
+
+The [timer-session journal prototype](2026-10-29-chronos-session-journal.md) adds
+observed start/end intervals with an explicit device-local storage contract.
+The first slice's task totals and existing sync data remain unchanged.

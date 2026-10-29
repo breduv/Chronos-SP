@@ -28,6 +28,7 @@ const OPTIONAL_TASK_FIELDS = Object.keys({
   updated: true,
   doneOn: true,
   wontDoOn: true,
+  isChronosQuickActivity: true,
   parentId: true,
   remindAt: true,
   repeatCfgId: true,
@@ -56,7 +57,7 @@ const OPTIONAL_TASK_FIELDS = Object.keys({
  * Optional fields added after v19.2.0. Snapshots from released clients don't
  * list them in `clearedFields`, so they're cleared but not required below.
  */
-const OPTIONAL_TASK_FIELDS_AFTER_V19_2 = new Set(['wontDoOn']);
+const OPTIONAL_TASK_FIELDS_AFTER_V19_2 = new Set(['wontDoOn', 'isChronosQuickActivity']);
 
 /** Resolution rows are inspected by their keys only, never merged by value. */
 export const isTimelessTaskPatch = (op: Operation, entityId: string): boolean => {

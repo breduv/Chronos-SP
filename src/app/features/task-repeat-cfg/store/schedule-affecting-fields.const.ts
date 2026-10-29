@@ -14,6 +14,7 @@ import { TaskRepeatCfgCopy } from '../task-repeat-cfg.model';
 const SCHEDULE_AFFECTING_BY_FIELD: Record<keyof TaskRepeatCfgCopy, boolean> = {
   id: false,
   projectId: false,
+  isChronosHabit: false,
   lastTaskCreation: false,
   lastTaskCreationDay: false,
   title: false,

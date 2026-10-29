@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  margin-top: var(--s3);
+}
+.session-journal {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--s2);
+}
+header,
+label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s);
+}
+header {
+  justify-content: space-between;
+  margin-bottom: var(--s2);
+}
+h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+label,
+.muted,
+.empty-sessions {
+  font-size: var(--font-size-sm);
+  color: var(--text-color-muted);
+}
+input {
+  background: var(--bg);
+  color: var(--text-color);
+  border: var(--task-separator);
+  border-radius: var(--radius-md);
+  padding: var(--s);
+  font: inherit;
+}
+p {
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+ol {
+  list-style: none;
+  margin: var(--s2) 0 0;
+  padding: 0;
+}
+.session-entry {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s) var(--s2);
+  border-bottom: var(--task-separator);
+  padding: var(--s2) 0;
+}
+.session-entry strong {
+  flex: 1 1 12ch;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.session-range,
+.duration {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.session-range {
+  font-size: var(--font-size-sm);
+  color: var(--text-color-muted);
+}
+.session-running {
+  border-inline-start: var(--s-half) solid var(--brand);
+  padding-inline-start: var(--s);
+}
+.empty-sessions {
+  margin-top: var(--s2);
+}
+.callout {
+  margin-top: var(--s2);
+}

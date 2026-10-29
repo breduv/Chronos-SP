@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { WorkContextService } from '../../features/work-context/work-context.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ChronosDayOverviewComponent } from './chronos-day-overview.component';
@@ -28,6 +28,20 @@ export class TagTaskPageComponent {
   readonly isToday = this._workContextService.isTodayListSignal;
 
   backlogTasks = toSignal(this._workContextService.backlogTasks$, { initialValue: [] });
-  doneTasks = toSignal(this._workContextService.doneTasks$, { initialValue: [] });
-  undoneTasks = toSignal(this._workContextService.undoneTasks$, { initialValue: [] });
+  private _doneTasks = toSignal(this._workContextService.doneTasks$, {
+    initialValue: [],
+  });
+  private _undoneTasks = toSignal(this._workContextService.undoneTasks$, {
+    initialValue: [],
+  });
+  readonly undoneTasks = computed(() =>
+    this.isToday()
+      ? this._undoneTasks().filter((task) => !task.isChronosQuickActivity)
+      : this._undoneTasks(),
+  );
+  readonly doneTasks = computed(() =>
+    this.isToday()
+      ? this._doneTasks().filter((task) => !task.isChronosQuickActivity)
+      : this._doneTasks(),
+  );
 }

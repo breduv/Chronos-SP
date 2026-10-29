@@ -1,3 +1,5 @@
+import { selectLocalizationConfig } from './global-config.reducer';
+import { LanguageCode } from '../../../core/locale.constants';
 import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -80,6 +82,31 @@ describe('GlobalConfigEffects', () => {
     if (store) {
       store.resetSelectors();
     }
+  });
+
+  describe('applyLanguageFromState$', () => {
+    it('uses Russian for an unset preference and preserves explicit language and system choices', () => {
+      setup();
+      const localization = store.overrideSelector(selectLocalizationConfig, {
+        ...DEFAULT_GLOBAL_CONFIG.localization,
+        lng: undefined,
+      });
+      const setLng = TestBed.inject(LanguageService).setLng as jasmine.Spy;
+      const subscription = effects.applyLanguageFromState$.subscribe();
+      expect(setLng).toHaveBeenCalledWith(LanguageCode.ru);
+
+      localization.setResult({
+        ...DEFAULT_GLOBAL_CONFIG.localization,
+        lng: LanguageCode.en,
+      });
+      store.refreshState();
+      expect(setLng).toHaveBeenCalledWith(LanguageCode.en);
+
+      localization.setResult({ ...DEFAULT_GLOBAL_CONFIG.localization, lng: null });
+      store.refreshState();
+      expect(setLng).toHaveBeenCalledWith(null);
+      subscription.unsubscribe();
+    });
   });
 
   describe('setStartOfNextDayDiffOnChange', () => {

@@ -1,0 +1,176 @@
+<section
+  class="routine-panel"
+  [attr.aria-label]="T.F.CHRONOS.ROUTINE | translate"
+>
+  @if (!habitOnly()) {
+    <header>
+      <h2>{{ T.F.CHRONOS.ROUTINE | translate }}</h2>
+      <label
+        >{{ T.F.CHRONOS.SESSION_DAY | translate
+        }}<input
+          class="routine-day"
+          type="date"
+          [value]="day()"
+          (change)="selectDay($event)"
+      /></label>
+    </header>
+    <ol class="planned-slots">
+      @for (slot of planned(); track slot.task.id) {
+        <li>
+          <span
+            >{{ slot.start | localeDate: 'HH:mm' }}
+            @if (slot.end > slot.start) {
+              — {{ slot.end | localeDate: 'HH:mm' }}
+            }
+          </span>
+          <strong>{{ slot.task.title }}</strong>
+          <button
+            mat-button
+            (click)="editTask(slot.task)"
+          >
+            {{ T.F.CHRONOS.EDIT_EVENT | translate }}
+          </button>
+        </li>
+      } @empty {
+        <li class="muted">{{ T.F.CHRONOS.ROUTINE_EMPTY | translate }}</li>
+      }
+    </ol>
+  }
+  <details class="routine-create">
+    <summary>
+      {{ (habitOnly() ? T.F.CHRONOS.ADD_HABIT : T.F.CHRONOS.ADD_ROUTINE) | translate }}
+    </summary>
+    <form (submit)="save($event)">
+      @if (!habitOnly()) {
+        <label
+          >{{ T.F.CHRONOS.ROUTINE_KIND | translate
+          }}<select
+            class="routine-kind"
+            [value]="mode()"
+            (change)="mode.set(value($event))"
+          >
+            <option value="event">{{ T.F.CHRONOS.EVENT | translate }}</option>
+            <option value="habit">{{ T.F.CHRONOS.HABIT | translate }}</option>
+          </select></label
+        >
+      }
+      <label
+        >{{ T.F.CHRONOS.ROUTINE_NAME | translate
+        }}<input
+          class="routine-name"
+          name="title"
+          [value]="name()"
+          (input)="name.set(value($event))"
+          required
+      /></label>
+      @if (isHabit()) {
+        <label
+          >{{ T.F.CHRONOS.HABIT_TIME | translate
+          }}<input
+            class="habit-time"
+            type="time"
+            name="time"
+            [value]="time()"
+            (input)="time.set(value($event))"
+            required
+        /></label>
+        <fieldset>
+          <legend>{{ T.F.CHRONOS.HABIT_DAYS | translate }}</legend>
+          @for (item of days; track item.day) {
+            <label
+              ><input
+                type="checkbox"
+                [checked]="weekdays().includes(item.day)"
+                (change)="toggleWeekday(item.day)"
+              />{{ item.label | translate }}</label
+            >
+          }
+        </fieldset>
+      } @else {
+        <label
+          >{{ T.F.CHRONOS.EVENT_START | translate
+          }}<input
+            class="event-start"
+            type="datetime-local"
+            name="start"
+            [value]="start()"
+            (input)="start.set(value($event))"
+            required
+        /></label>
+        <label
+          >{{ T.F.CHRONOS.EVENT_END | translate
+          }}<input
+            class="event-end"
+            type="datetime-local"
+            name="end"
+            [value]="end()"
+            (input)="end.set(value($event))"
+            required
+        /></label>
+      }
+      <label
+        >{{ T.F.CHRONOS.REMINDER | translate
+        }}<select
+          class="routine-reminder"
+          [value]="reminder()"
+          (change)="setReminder($event)"
+        >
+          @for (option of options; track option.value) {
+            <option [value]="option.value">{{ option.label | translate }}</option>
+          }
+        </select></label
+      >
+      @if (error()) {
+        <p class="routine-error">{{ T.F.CHRONOS.ROUTINE_INVALID | translate }}</p>
+      }
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="saving()"
+      >
+        {{ T.F.CHRONOS.ROUTINE_SAVE | translate }}
+      </button>
+    </form>
+  </details>
+  @if (habits().length || habitOnly()) {
+    <h2 class="habit-heading">{{ T.F.CHRONOS.SCHEDULED_HABITS | translate }}</h2>
+    <ul class="scheduled-habits">
+      @for (habit of habits(); track habit.config.id) {
+        <li>
+          <span>{{ habit.config.startTime }}</span
+          ><strong>{{ habit.config.title }}</strong>
+          @if (habit.task; as task) {
+            <button
+              mat-stroked-button
+              [attr.aria-pressed]="task.isDone"
+              (click)="routine.toggleDone(task)"
+            >
+              {{
+                (task.isDone ? T.F.CHRONOS.HABIT_DONE : T.F.CHRONOS.HABIT_COMPLETE)
+                  | translate
+              }}
+            </button>
+          }
+          <button
+            mat-button
+            (click)="editHabit(habit.config)"
+          >
+            {{ T.F.CHRONOS.QUICK_MANAGE | translate }}
+          </button>
+          <button
+            mat-button
+            (click)="routine.pauseHabit(habit.config)"
+          >
+            {{
+              (habit.config.isPaused ? T.F.CHRONOS.HABIT_RESUME : T.F.CHRONOS.HABIT_PAUSE)
+                | translate
+            }}
+          </button>
+        </li>
+      } @empty {
+        <li class="muted">{{ T.F.CHRONOS.HABITS_EMPTY | translate }}</li>
+      }
+    </ul>
+  }
+</section>

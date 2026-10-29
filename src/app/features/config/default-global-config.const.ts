@@ -1,3 +1,4 @@
+import { LanguageCode } from '../../core/locale.constants';
 import { environment } from '../../../environments/environment';
 import { DEFAULT_FOCUS_MODE_SOUND_VOLUME } from '../focus-mode/focus-mode.model';
 import {
@@ -36,7 +37,7 @@ export const DEFAULT_GLOBAL_CONFIG: GlobalConfigState = {
     isFinishDayEnabled: true,
   },
   localization: {
-    lng: undefined,
+    lng: LanguageCode.ru,
     dateTimeLocale: undefined,
     firstDayOfWeek: undefined,
   },

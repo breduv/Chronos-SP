@@ -1,0 +1,72 @@
+<section [attr.aria-label]="T.F.CHRONOS.QUICK_TITLE | translate">
+  <header>
+    <h2>{{ T.F.CHRONOS.QUICK_TITLE | translate }}</h2>
+    <button
+      mat-button
+      [attr.aria-expanded]="managing()"
+      (click)="managing.set(!managing())"
+    >
+      {{ T.F.CHRONOS.QUICK_MANAGE | translate }}
+    </button>
+  </header>
+  <p>{{ T.F.CHRONOS.QUICK_NOTE | translate }}</p>
+  <div class="quick-buttons">
+    @for (task of quick.activities(); track task.id) {
+      <button
+        class="quick-activity"
+        [matButton]="quick.currentId() === task.id ? 'filled' : 'outlined'"
+        [attr.aria-pressed]="quick.currentId() === task.id"
+        (click)="quick.toggle(task.id)"
+      >
+        {{ task.title }}
+      </button>
+    }
+    @for (title of suggestions(); track title) {
+      <button
+        class="quick-suggestion"
+        mat-stroked-button
+        (click)="quick.startSuggested(title)"
+      >
+        {{ title }}
+      </button>
+    }
+  </div>
+  @if (managing()) {
+    <form (submit)="add($event)">
+      <label
+        ><span>{{ T.F.CHRONOS.QUICK_NAME | translate }}</span>
+        <input
+          name="activity"
+          [value]="name()"
+          (input)="setName($event)"
+          required
+        />
+      </label>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="!name().trim()"
+      >
+        {{ T.F.CHRONOS.QUICK_ADD | translate }}
+      </button>
+    </form>
+    <ul>
+      @for (task of quick.activities(); track task.id) {
+        <li>
+          <input
+            [attr.aria-label]="T.F.CHRONOS.QUICK_RENAME | translate"
+            [value]="task.title"
+            (change)="rename(task, $event)"
+          />
+          <button
+            mat-button
+            (click)="quick.unpin(task)"
+          >
+            {{ T.F.CHRONOS.QUICK_UNPIN | translate }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>

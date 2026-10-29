@@ -97,6 +97,9 @@ export interface TaskCopy
   projectId: string;
   timeSpentOnDay: TimeSpentOnDay;
 
+  /** Reusable one-tap activity in Chronos. Missing means a normal task. */
+  isChronosQuickActivity?: boolean;
+
   // Additional app-specific fields
 
   /**

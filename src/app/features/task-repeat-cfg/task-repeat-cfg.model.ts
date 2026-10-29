@@ -35,6 +35,8 @@ export type MonthlyWeekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export interface TaskRepeatCfgCopy {
   id: string;
   projectId: string | null;
+  /** A scheduled Chronos habit. Missing means an ordinary repeating task. */
+  isChronosHabit?: boolean;
   // TODO remove at some point
   lastTaskCreation?: number;
   lastTaskCreationDay?: string;
