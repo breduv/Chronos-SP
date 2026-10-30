@@ -16,21 +16,61 @@
       /></mat-form-field>
     </header>
     <ol class="planned-slots">
-      @for (slot of planned(); track slot.task.id) {
+      @for (slot of planned(); track slot.id) {
         <li>
           <span
             >{{ slot.start | localeDate: 'HH:mm' }}
-            @if (slot.task.hasPlannedTime && slot.end > slot.start) {
+            @if (slot.end > slot.start) {
               — {{ slot.end | localeDate: 'HH:mm' }}
             }
           </span>
-          <strong>{{ slot.task.title }}</strong>
-          <button
-            mat-button
-            (click)="editTask(slot.task)"
-          >
-            {{ T.F.CHRONOS.EDIT_EVENT | translate }}
-          </button>
+          <strong>{{ slot.title }}</strong>
+          @if (slot.task; as task) {
+            <button
+              mat-button
+              class="edit-entry"
+              (click)="editTask(task)"
+            >
+              {{ T.F.CHRONOS.EDIT_EVENT | translate }}
+            </button>
+            <button
+              mat-button
+              class="edit-repeat"
+              (click)="editRepeat(task)"
+            >
+              {{ T.F.CHRONOS.REPEAT | translate }}
+            </button>
+          } @else if (slot.repeatCfg; as config) {
+            <span class="muted">{{ T.F.CHRONOS.REPEAT_PREVIEW | translate }}</span>
+            <button
+              mat-button
+              class="edit-repeat"
+              (click)="editHabit(config)"
+            >
+              {{ T.F.CHRONOS.REPEAT | translate }}
+            </button>
+          }
+          @if (slot.notes) {
+            <button
+              mat-button
+              [attr.aria-expanded]="notesOpen() === slot.id"
+              [attr.aria-controls]="'entry-notes-' + slot.id"
+              (click)="notesOpen.set(notesOpen() === slot.id ? null : slot.id)"
+            >
+              {{ T.F.CHRONOS.DETAILS | translate }}
+            </button>
+            @if (notesOpen() === slot.id) {
+              <div
+                class="entry-notes"
+                [id]="'entry-notes-' + slot.id"
+              >
+                <markdown
+                  [data]="slot.notes"
+                  class="markdown-parsed markdown"
+                />
+              </div>
+            }
+          }
         </li>
       } @empty {
         <li class="muted">{{ T.F.CHRONOS.ROUTINE_EMPTY | translate }}</li>
@@ -74,6 +114,21 @@
           (input)="name.set(value($event))"
           required
       /></mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ T.F.CHRONOS.NOTES | translate }}</mat-label>
+        <textarea
+          matInput
+          class="routine-notes"
+          name="notes"
+          rows="3"
+          [value]="notes()"
+          (input)="notes.set(value($event))"
+          [placeholder]="T.F.CHRONOS.NOTES_HINT | translate"
+        ></textarea>
+      </mat-form-field>
+      @if (editing()?.repeatCfgId) {
+        <p class="muted">{{ T.F.CHRONOS.EDIT_INSTANCE_NOTE | translate }}</p>
+      }
       @if (isHabit()) {
         <mat-form-field
           ><mat-label>{{ T.F.CHRONOS.HABIT_TIME | translate }}</mat-label

@@ -4,6 +4,14 @@
     <p class="day-date">{{ displayDay() }}</p>
   </div>
   <nav [attr.aria-label]="T.F.CHRONOS.NAV | translate">
+    @if (day() !== today()) {
+      <button
+        mat-button
+        (click)="selectedDay.set(null)"
+      >
+        {{ T.G.TODAY_TAG_TITLE | translate }}
+      </button>
+    }
     @if (features().isSchedulerEnabled) {
       <a
         mat-button
@@ -46,16 +54,17 @@
 }
 
 <chronos-quick-activities />
-<chronos-routine />
+<chronos-routine [(selectedDay)]="selectedDay" />
 
-<div class="day-layout">
-  <section
-    class="day-plan"
-    [attr.aria-label]="T.F.CHRONOS.PLAN | translate"
-  >
-    <h2>{{ T.F.CHRONOS.PLAN | translate }}</h2>
-    <ng-content />
-  </section>
-</div>
-
-<chronos-session-timeline />
+@if (day() === today()) {
+  <div class="day-layout">
+    <section
+      class="day-plan"
+      [attr.aria-label]="T.F.CHRONOS.PLAN | translate"
+    >
+      <h2>{{ T.F.CHRONOS.PLAN | translate }}</h2>
+      <ng-content />
+    </section>
+  </div>
+}
+<chronos-session-timeline [(selectedDay)]="selectedDay" />

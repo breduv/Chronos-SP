@@ -3,7 +3,7 @@ import {
   Component,
   computed,
   inject,
-  signal,
+  model,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
@@ -37,7 +37,7 @@ export class ChronosSessionTimelineComponent {
   readonly journal = inject(ChronosSessionJournalService);
   readonly T = T;
   readonly today = inject(Store).selectSignal(selectTodayStr);
-  readonly selectedDay = signal<string | null>(null);
+  readonly selectedDay = model<string | null>(null);
   readonly day = computed(
     () => this.selectedDay() || this.today() || this._date.todayStr(),
   );

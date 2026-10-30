@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -36,9 +42,11 @@ export class ChronosDayOverviewComponent {
   readonly T = T;
   readonly features = inject(GlobalConfigService).appFeatures;
   readonly today = this._store.selectSignal(selectTodayStr);
+  readonly selectedDay = signal<string | null>(null);
+  readonly day = computed(() => this.selectedDay() || this.today());
   private readonly _dateFormat = inject(DateTimeFormatService);
   readonly displayDay = computed(() =>
-    this.today() ? this._dateFormat.formatDate(new Date(this.today() + 'T12:00:00')) : '',
+    this.day() ? this._dateFormat.formatDate(new Date(this.day() + 'T12:00:00')) : '',
   );
   readonly currentTask = toSignal(this._tasks.currentTask$, { initialValue: null });
   readonly currentTime = computed(

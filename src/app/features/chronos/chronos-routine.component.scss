@@ -68,3 +68,9 @@ form button {
 .routine-error {
   color: var(--color-danger);
 }
+
+.entry-notes {
+  flex-basis: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

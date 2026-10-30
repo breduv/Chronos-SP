@@ -2549,7 +2549,13 @@
       "CANCEL_EDIT": "Cancel editing",
       "SIDEBAR_COMPACT": "Compact menu",
       "SIDEBAR_FULL": "Expand menu",
-      "SIDEBAR_RESIZE": "Resize menu"
+      "SIDEBAR_RESIZE": "Resize menu",
+      "NOTES": "Details",
+      "NOTES_HINT": "Address, purpose, things to bring, links…",
+      "DETAILS": "Details",
+      "REPEAT": "Repeat",
+      "EDIT_INSTANCE_NOTE": "These changes apply only to this entry. Use Repeat to change the series schedule and shared settings.",
+      "REPEAT_PREVIEW": "Scheduled repeat"
     }
   },
   "FILE_IMEX": {

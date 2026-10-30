@@ -1,5 +1,6 @@
 import {
   TASK_REMINDER_OPTIONS,
+  toPersistableRemindOption,
   TASK_REMINDER_OPTIONS_WITHOUT_LONG_LEAD,
 } from '../planner/dialog-schedule-task/task-reminder-options.const';
 import { millisecondsDiffToRemindOption } from '../tasks/util/remind-option-to-milliseconds';
@@ -9,6 +10,9 @@ import {
   computed,
   inject,
   input,
+  model,
+  effect,
+  untracked,
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,9 +31,8 @@ import { selectTodayStr } from '../../root-store/app-state/app-state.selectors';
 import { LocaleDatePipe } from '../../ui/pipes/locale-date.pipe';
 import { TaskRepeatCfg } from '../task-repeat-cfg/task-repeat-cfg.model';
 import { Task, TaskReminderOptionId } from '../tasks/task.model';
-import { DialogScheduleTaskComponent } from '../planner/dialog-schedule-task/dialog-schedule-task.component';
+import { MarkdownComponent } from 'ngx-markdown';
 import { ChronosRoutineService } from './chronos-routine.service';
-import { getChronosDayWindow } from './chronos-session-journal';
 
 @Component({
   selector: 'chronos-routine',
@@ -43,6 +46,7 @@ import { getChronosDayWindow } from './chronos-session-journal';
     MatInputModule,
     MatCheckboxModule,
     MatExpansionModule,
+    MarkdownComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,7 +57,7 @@ export class ChronosRoutineComponent {
   readonly habitOnly = input(false);
   readonly T = T;
   readonly today = inject(Store).selectSignal(selectTodayStr);
-  readonly selectedDay = signal<string | null>(null);
+  readonly selectedDay = model<string | null>(null);
   readonly day = computed(
     () => this.selectedDay() || this.today() || this._date.todayStr(),
   );
@@ -62,6 +66,8 @@ export class ChronosRoutineComponent {
   readonly editing = signal<Task | null>(null);
   readonly isHabit = computed(() => this.habitOnly() || this.mode() === 'habit');
   readonly name = signal('');
+  readonly notes = signal('');
+  readonly notesOpen = signal<string | null>(null);
   readonly start = signal(this._date.todayStr() + 'T09:00');
   readonly end = signal(this._date.todayStr() + 'T10:00');
   readonly time = signal('09:00');
@@ -69,6 +75,16 @@ export class ChronosRoutineComponent {
   readonly reminder = signal(TaskReminderOptionId.DoNotRemind);
   readonly error = signal(false);
   readonly saving = signal(false);
+  constructor() {
+    effect(() => {
+      const day = this.day();
+      untracked(() => {
+        this.start.set(day + 'T09:00');
+        this.end.set(day + 'T10:00');
+        this.cancelEdit();
+      });
+    });
+  }
   readonly options = computed(() =>
     this.isHabit() ? TASK_REMINDER_OPTIONS_WITHOUT_LONG_LEAD : TASK_REMINDER_OPTIONS,
   );
@@ -88,25 +104,9 @@ export class ChronosRoutineComponent {
     ),
     { initialValue: this._date.getStartOfNextDayDiffMs() },
   );
-  readonly planned = computed(() => {
-    const [start, end] = getChronosDayWindow(this.day(), this._dayOffset());
-    return this.routine
-      .allTasks()
-      .filter(
-        (task) =>
-          !task.parentId &&
-          !task.isChronosQuickActivity &&
-          !!task.dueWithTime &&
-          task.dueWithTime >= start &&
-          task.dueWithTime < end,
-      )
-      .map((task) => ({
-        task,
-        start: task.dueWithTime!,
-        end: task.dueWithTime! + task.timeEstimate,
-      }))
-      .sort((a, b) => a.start - b.start);
-  });
+  readonly planned = computed(() =>
+    this.routine.entriesForDay(this.day(), this._dayOffset()),
+  );
   readonly habits = computed(() =>
     this.routine.habits().map((config) => ({
       config,
@@ -119,10 +119,6 @@ export class ChronosRoutineComponent {
   selectDay(event: Event): void {
     const day = this.value(event);
     this.selectedDay.set(day || null);
-    if (day) {
-      this.start.set(day + 'T09:00');
-      this.end.set(day + 'T10:00');
-    }
   }
   setReminder(event: Event): void {
     this.reminder.set(this.value(event) as TaskReminderOptionId);
@@ -140,30 +136,30 @@ export class ChronosRoutineComponent {
     try {
       const eventInput = {
         title: this.name(),
+        notes: this.notes(),
         start: this.start(),
         end: this.end(),
         reminder: this.reminder(),
       };
       const editing = this.editing();
       const id = editing
-        ? this.routine.updateEvent(editing, eventInput)
+        ? this.mode() === 'task'
+          ? this.routine.updateTask(editing, eventInput)
+          : this.routine.updateEvent(editing, eventInput)
         : this.mode() === 'task' && !this.habitOnly()
           ? await this.routine.addTask(eventInput)
           : this.isHabit()
             ? this.routine.addHabit({
                 title: this.name(),
+                notes: this.notes(),
                 time: this.time(),
                 weekdays: this.weekdays(),
                 reminder: this.reminder(),
               })
-            : await this.routine.addEvent({
-                title: this.name(),
-                start: this.start(),
-                end: this.end(),
-                reminder: this.reminder(),
-              });
+            : await this.routine.addEvent(eventInput);
       if (id) {
         this.name.set('');
+        this.notes.set('');
         this.editing.set(null);
       } else this.error.set(true);
     } catch {
@@ -178,27 +174,39 @@ export class ChronosRoutineComponent {
     this._dialog.open(DialogEditTaskRepeatCfgComponent, { data: { repeatCfg: config } });
   }
   editTask(task: Task): void {
-    if (!task.hasPlannedTime || !task.timeEstimate || !task.dueWithTime) {
-      this._dialog.open(DialogScheduleTaskComponent, { data: { task, minDate: null } });
-      return;
-    }
+    if (!task.dueWithTime) return;
     const local = (value: number): string => {
       const date = new Date(value);
       const offsetMs = date.getTimezoneOffset() * 60000;
       return new Date(value - offsetMs).toISOString().slice(0, 16);
     };
     this.editing.set(task);
-    this.mode.set('event');
+    this.mode.set(this.routine.isEvent(task) ? 'event' : 'task');
     this.name.set(task.title);
+    this.notes.set(task.notes || '');
     this.start.set(local(task.dueWithTime));
     this.end.set(local(task.dueWithTime + task.timeEstimate));
     this.reminder.set(millisecondsDiffToRemindOption(task.dueWithTime, task.remindAt));
     this.error.set(false);
     this.expanded.set(true);
   }
+  async editRepeat(task: Task): Promise<void> {
+    const { DialogEditTaskRepeatCfgComponent } =
+      await import('../task-repeat-cfg/dialog-edit-task-repeat-cfg/dialog-edit-task-repeat-cfg.component');
+    this._dialog.open(DialogEditTaskRepeatCfgComponent, {
+      data: {
+        task,
+        repeatCfg: this.routine.repeatForTask(task),
+        defaultRemindOption: toPersistableRemindOption(
+          millisecondsDiffToRemindOption(task.dueWithTime || 0, task.remindAt),
+        ),
+      },
+    });
+  }
   cancelEdit(): void {
     this.editing.set(null);
     this.name.set('');
+    this.notes.set('');
     this.error.set(false);
   }
 }
